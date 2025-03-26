@@ -1,0 +1,13 @@
+.v-app-bar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  .white--text {
+    color: white !important;
+  }
+  .logo {
+  object-fit: contain; /* Asegura que la imagen no se recorte y mantenga sus proporciones */
+  width: 40px; /* Tamaño del logo */
+  height: 40px; /* Tamaño del logo */
+  border-radius: 100px; /* Redondea la imagen, lo convierte en un círculo */
+  padding: 5px; /* Añade espacio alrededor de la imagen */
+}
