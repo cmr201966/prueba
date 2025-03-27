@@ -2,10 +2,11 @@
     <DefaultLayout>
       <v-container>
         <h1>Acerca de nosotros</h1>
-        <p>    DesTodo es tu plataforma 'todo en uno', donde puedes encontrar servicios y productos variados en
-               Santiago de Cuba, incluye transporte, fotografía, ventas, fiestas, restaurantes, clubes, bares, discotecas y mucho más. 
-               Conecta con los servicios y productos que necesitas de manera rápida y fácil.
-        </p>
+        <p>DesTodo es tu plataforma donde puedes encontrar todo tipo servicios y productos</p>
+        <p>Email:    destodo@gmail.com</p>
+        <p>Teléfono: 52675359</p>
+        <p>whatsapp: 53178447</p>
+        <p>WWW:      https://destodo.web.app</p>
       </v-container>
     </DefaultLayout>
   </template>

@@ -1,57 +1,54 @@
-
 <template>
   <DefaultLayout>
     <v-container class="div-anuncios anuncios container-anuncios">
       <h3 class="strong">Publicar anuncios</h3>
-      <label>Anuncio</label>
 
       <!-- Combo con los anuncios obtenidos -->
       <v-select class="app-select custom-select"
-         v-model="selectedAnuncio"   
-         :items="anuncios"           
+         v-model="selectedAnuncio"
+         label="Anuncio"
+         :items="filteredAnuncios"
          item-text="title"
          item-value="id"             
-         outlined
-         style="height: 32px;"   
+         density="compact"
       ></v-select>
 
-
-      <label v-if="agregarsn || editarsn">Descripción</label>
-      <v-text-field v-if="agregarsn || editarsn" class="form-control app-input-area"
+      <v-text-field v-if="agregarsn || editarsn" 
+         class="form-control app-input-area"
+         ref="descFoco"
          v-model="descripcion"
-         outlined
-         dense
-         style="height: 20px;" 
-       />
+         label="descripcion"
+         density="compact"
+      />
 
-  <!-- Contenedor para los botones alineados a la derecha -->
-  <v-row class="grupo-button-app">
-    <v-spacer></v-spacer> <!-- Empuja los botones a la derecha -->
+      <!-- Contenedor para los botones alineados a la derecha -->
+      <v-row class="grupo-button-app">
+        <v-spacer></v-spacer> <!-- Empuja los botones a la derecha -->
 
-    <v-btn v-if="agregarsn || editarsn" color="success" class="mr-2" @click="confirmarAnuncio">
-       <v-icon left>mdi-check</v-icon> 
-       Confirmar
-    </v-btn>
-    <v-btn v-if="!agregarsn && !editarsn" color="success" class="mr-2" @click="agregarAnuncio">
-       <v-icon left>mdi-plus</v-icon> 
-       Agregar
-    </v-btn>
-    <v-btn v-if="!agregarsn && !editarsn" color="warning" class="mr-2" @click="editarAnuncio">
-      <v-icon left>mdi-pencil</v-icon> 
-      Editar
-    </v-btn>
+        <v-btn v-if="agregarsn || editarsn" color="success" class="mr-2" @click="confirmarAnuncio">
+           <v-icon left>mdi-check</v-icon> 
+           Confirmar
+        </v-btn>
+        <v-btn v-if="!agregarsn && !editarsn" color="success" class="mr-2" @click="agregarAnuncio">
+           <v-icon left>mdi-plus</v-icon> 
+           Agregar
+        </v-btn>
+        <v-btn v-if="!agregarsn && !editarsn" color="warning" class="mr-2" @click="editarAnuncio">
+          <v-icon left>mdi-pencil</v-icon> 
+          Editar
+        </v-btn>
 
-    <v-btn v-if="!agregarsn && !editarsn" color="error"  @click="eliminarAnuncio">
-      <v-icon left>mdi-delete</v-icon>
-      Eliminar
-    </v-btn>
-    <v-btn v-if="agregarsn || editarsn" color="error"  @click="cancelarAnuncio">
-      <v-icon left>mdi-close</v-icon>
-      Cancelar
-    </v-btn>
-  </v-row>
- </v-container>
- </DefaultLayout>
+        <v-btn v-if="!agregarsn && !editarsn" color="error"  @click="eliminarAnuncio">
+          <v-icon left>mdi-delete</v-icon>
+          Eliminar
+        </v-btn>
+        <v-btn v-if="agregarsn || editarsn" color="error"  @click="cancelarAnuncio">
+          <v-icon left>mdi-close</v-icon>
+          Cancelar
+        </v-btn>
+      </v-row>
+    </v-container>
+  </DefaultLayout>
 </template>
 
 <script>
@@ -67,138 +64,134 @@ export default {
   data() {
     return {
       anuncios: [],             // Almacenará los anuncios
+      filteredAnuncios: [], // Almacena los anuncios filtrados
       selectedAnuncio: null,    // Almacenará el anuncio seleccionado
       descripcion: "",
-      agregarsn : false,
-      editarsn  : false,
-      eliminarsn : false
+      agregarsn: false,
+      editarsn: false,
+      eliminarsn: false
     };
   },
+
   mounted() {
     // Llamada a la API para obtener los anuncios al montar el componente
     this.fetchAnuncios();
   },
+  
   methods: {
-    confirmarAnuncio() {
-      this.agregarsn=true;
-    },
-    cancelarAnuncio() {
-      this.agregarsn=false;
-      this.editarsn=false;
-    },
-    agregarAnuncio() {
-      this.agregarsn=true;
-    },
-    editarAnuncio() {
-      this.editarsn=true;
-    },
-    eliminarAnuncio() {
-    },
-    async add_Anuncio() {
-      try {
-      const response = await api.post('/add_anuncio', {
-        desc: anuncio.value,
+    setFocus() {
+      // Aquí se coloca el foco en el v-text-field
+      this.$nextTick(() => {
+        if (this.$refs.descFoco) {
+          this.$refs.descFoco.focus();
+        } else {
+          console.warn('El campo con ref "desc" no está disponible.');
+        }
       });
-      localStorage.setItem('token', response.data.token);
-      router.push('/');      
+    },
+
+    async confirmarAnuncio() {
+      const anuncioData = {
+        descripcion: this.descripcion,  // Valor de la descripción
+      };
+      
+      if (!this.agregarsn) {
+        // Si no es un nuevo anuncio, agregamos el ID
+        anuncioData.id = this.selectedAnuncio;
+      }
+      try {
+        // Llamamos al backend para guardar el anuncio (insertar o actualizar)
+        const response = await api.post('/set_anuncio', anuncioData);
+        
+        // Confirmación de que se guardó correctamente
+        console.log(response.data.message);
+        // Refrescar el select con los anuncios actualizados
+        this.fetchAnuncios();
       } catch (error) {
         console.error('Error de autenticación', error);
         alert('Credenciales incorrectas');
       }
+
+      this.agregarsn = false;
+      this.editarsn = false;
     },
-    async editAnuncio() {
-      console.log(this.selectedAnuncio)
-      return
+
+    cancelarAnuncio() {
+      this.agregarsn = false;
+      this.editarsn = false;
+    },
+
+    agregarAnuncio() {
+      this.descripcion = "";
+      this.agregarsn = true;
+      this.setFocus();
+    },
+
+    async editarAnuncio() {
+      // Buscar el id en backend para tomar la desc y poder editarla
+      const response = await api.get(`/get_anuncio/${this.selectedAnuncio}`);
+      this.descripcion = response.data.descripcion;
+      this.editarsn = true;
+      this.setFocus();
+    },
+
+    async eliminarAnuncio() {
       try {
-      const response = await api.post('/edit_anuncio', {
-        desc: anuncio.value,
-      });
-      router.push('/');      
+        const response = await api.delete(`/del_anuncio/${this.selectedAnuncio}`);
+        // Refrescar el select con los anuncios actualizados
+        this.fetchAnuncios();
       } catch (error) {
-        console.error('Error al editar', error);
-        alert('Error al editar');
+        console.error('Error al eliminar el anuncio:', error.response || error);
+        alert('Error al eliminar');
       }
     },
 
-    async delAnuncio() {
-      try {
-      const response = await api.post('/del_anuncio', {
-        id: anuncio.id,
-      });
-      router.push('/');      
-      } catch (error) {
-        console.error('Error al editar', error);
-        alert('Error al editar');
+    // Método para filtrar los anuncios según el texto de búsqueda
+    filterAnuncios(searchText) {
+      if (!searchText) {
+        this.filteredAnuncios = this.anuncios;
+      } else {
+        this.filteredAnuncios = this.anuncios.filter(anuncio =>
+          anuncio.title.toLowerCase().includes(searchText.toLowerCase())
+        );
       }
     },
 
-
+    // Método para obtener los anuncios
     async fetchAnuncios() {
-  try {
-    // Realizamos la solicitud GET para obtener los anuncios
-    const response = await api.get('/anuncios');  // Asumimos que este es el endpoint correcto
-    
-    let anunciosFormateados = [];
-    
-    // Verificamos que los datos sean un array
-    if (Array.isArray(response.data)) {
-      for (let i = 0; i < response.data.length; i++) {
-        let fila = response.data[i];
+      try {
+        // Realizamos la solicitud GET para obtener los anuncios
+        const response = await api.get('/anuncios');  // Asumimos que este es el endpoint correcto
+        
+        let anunciosFormateados = [];
+        
+        // Verificamos que los datos sean un array
+        if (Array.isArray(response.data)) {
+          for (let i = 0; i < response.data.length; i++) {
+            let fila = response.data[i];
 
-        // Creamos un objeto con las propiedades id y desc
-        let anuncio = {
-          id: fila[0],    // El ID del anuncio
-          title: fila[1],  // La descripción del anuncio
-        };
+            // Creamos un objeto con las propiedades id y desc
+            let anuncio = {
+              id: fila[0],    // El ID del anuncio
+              title: fila[1],  // La descripción del anuncio
+            };
 
-        // Añadimos el objeto formateado al array anunciosFormateados
-        anunciosFormateados.push(anuncio);
+            // Añadimos el objeto formateado al array anunciosFormateados
+            anunciosFormateados.push(anuncio);
+            // Inicializamos filteredAnuncios con todos los anuncios al principio
+          }
+
+          // Asignamos el array formateado a 'this.anuncios'
+          this.anuncios = anunciosFormateados;
+          this.filteredAnuncios = anunciosFormateados; // Inicializar los anuncios filtrados
+        }
+      } catch (error) {
+        console.error('Hubo un error al obtener los anuncios:', error);
       }
-
-      // Asignamos el array formateado a 'this.anuncios'
-      this.anuncios = anunciosFormateados;
-      console.log(this.anuncios)
     }
-  } catch (error) {
-    console.error('Hubo un error al obtener los anuncios:', error);
-  }
-}
   }
 };
 </script>
+
 <style>
-/* Ajusta el estilo de la lista desplegable */
-.v-overlay-container .v-list {
-  padding: 0 !important; /* Elimina padding interno de la lista */
-}
-
-/* Ajusta cada ítem individualmente */
-.v-overlay-container .v-list-item {
-  min-height: 28px !important; /* Reduce la altura de las opciones */
-  padding: 3px 5px !important; /* Reduce el espacio interior */
-}
-.custom-select .v-field__input {
-    min-height: 0 !important;  /* Elimina el min-height */
-  }
-.custom-select .v-select__control {
-min-height: 0 !important;  /* Quita el min-height */
-}
-
-.custom-select .v-select__slot {
-min-height: 0 !important;  /* Opcional: también puedes quitar min-height del contenedor */
-}
-
-.custom-input .v-input__control {
-  min-height: unset !important;  /* Quitar altura mínima */
-  padding: 0 !important;         /* Eliminar relleno interno */
-  margin: 0 !important;          /* Quitar margen */
-  background: transparent !important; /* Eliminar color de fondo */
-  border: none !important;        /* Eliminar borde */
-  box-shadow: none !important;    /* Eliminar sombras */
-}
-
-.custom-input .v-input__control:before,
-.custom-input .v-input__control:after {
-  display: none !important; /* Eliminar líneas subrayadas */
-}
 </style>

@@ -7,16 +7,14 @@
             <v-text-field
               v-model="user"
               label="Nombre usuario:"
-              outlined
-              dense
+              density="compact"
               type="text"
             ></v-text-field>
   
             <v-text-field
               v-model="password"
               label="Contraseña"
-              outlined
-              dense
+              density="compact"
               type="password"
             ></v-text-field>
   

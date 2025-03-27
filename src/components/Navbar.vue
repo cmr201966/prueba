@@ -13,12 +13,14 @@
     
     <!-- Campo de búsqueda entre el título y los botones de navegación -->
     <v-text-field
+      v-model="searchText"
       placeholder="Buscar"
-      solo
       class="search-input"
       append-icon="mdi-magnify"
+      density="compact"
+      @input="emitSearchText"
     ></v-text-field>
-
+  
     <!-- Espaciador para alinear los elementos -->
     <v-spacer></v-spacer>
   
@@ -42,11 +44,20 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
-// Creamos una referencia reactiva para el estado de isLoggedIn
-const isLoggedIn = ref(localStorage.getItem('token') !== null);
+// Definir la propiedad reactiva
+const searchText = ref(""); // Almacena el texto de búsqueda
+const isLoggedIn = ref(localStorage.getItem('token') !== null); // Almacena si el usuario está logueado
 
 // Usamos useRouter para manejar la navegación en Vue Router
 const router = useRouter();
+
+// Emitir el evento con el texto de búsqueda
+const emitSearchText = () => {
+  // Emitir el evento 'search' con el texto
+  // Aquí estamos asumiendo que el componente padre maneja este evento.
+  // Asegúrate de que el componente padre tenga un manejador para el evento 'search'
+  emit('search', searchText.value);
+};
 
 // Método para cerrar sesión
 const logout = () => {
@@ -55,21 +66,21 @@ const logout = () => {
   
   // Actualizar el estado de isLoggedIn
   isLoggedIn.value = false;
-
+  router.push({ name: 'home' }); // Redirigir al home
 };
 
 // Métodos de navegación
 const goHome = () => {
-  // Redirigir al home (usando Vue Router)
-  router.push({ name: '/' });
+  // Redirigir al home
+  router.push({ name: 'home' });
 };
 
 const goToPage = (page) => {
-  // Redirigir a la página correspondiente (usando Vue Router)
+  // Redirigir a la página correspondiente
   router.push({ name: page });
 };
 </script>
 
 <script>
-  import './styles.css';
+import './styles.css';
 </script>
