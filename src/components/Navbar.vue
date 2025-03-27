@@ -47,21 +47,13 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import emitter from '../eventBus'; // Importamos el bus de eventos
+
 // Definir la propiedad reactiva
 const searchText = ref(""); // Almacena el texto de búsqueda
 const isLoggedIn = ref(localStorage.getItem('token') !== null); // Almacena si el usuario está logueado
 
 // Usamos useRouter para manejar la navegación en Vue Router
 const router = useRouter();
-
-// Emitir el evento con el texto de búsqueda
-//const emitSearchText = () => {
-  // Emitir el evento 'search' con el texto
-  // Aquí estamos asumiendo que el componente padre maneja este evento.
-  // Asegúrate de que el componente padre tenga un manejador para el evento 'search'
-//  emit('search', searchText.value);
-//};
-// Definir la propiedad reactiva
 
 // Emitir el evento con el texto de búsqueda
 const emitSearchText = () => {
