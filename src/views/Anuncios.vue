@@ -55,6 +55,7 @@
 import { ref } from 'vue';
 import DefaultLayout from '../layouts/DefaultLayout.vue';
 import api from '../api/axios';
+import emitter from '../eventBus'; // Importamos el bus de eventos
 
 export default {
   name: 'Anuncios',
@@ -76,9 +77,28 @@ export default {
   mounted() {
     // Llamada a la API para obtener los anuncios al montar el componente
     this.fetchAnuncios();
+    // Escuchamos el evento 'search' para filtrar los anuncios
+    emitter.on('search', this.filterAnuncios);    
   },
   
+
+  beforeUnmount() {
+    // Aseguramos de limpiar el evento cuando el componente se destruya
+    emitter.off('search', this.filterAnuncios);
+  },
+
   methods: {
+
+    filterAnuncios(searchText) {
+      if (!searchText) {
+        this.filteredAnuncios = this.anuncios;
+      } else {
+        this.filteredAnuncios = this.anuncios.filter(anuncio =>
+          anuncio.title.toLowerCase().includes(searchText.toLowerCase())
+        );
+      }
+    },
+
     setFocus() {
       // Aquí se coloca el foco en el v-text-field
       this.$nextTick(() => {
@@ -146,16 +166,6 @@ export default {
       }
     },
 
-    // Método para filtrar los anuncios según el texto de búsqueda
-    filterAnuncios(searchText) {
-      if (!searchText) {
-        this.filteredAnuncios = this.anuncios;
-      } else {
-        this.filteredAnuncios = this.anuncios.filter(anuncio =>
-          anuncio.title.toLowerCase().includes(searchText.toLowerCase())
-        );
-      }
-    },
 
     // Método para obtener los anuncios
     async fetchAnuncios() {
@@ -195,3 +205,5 @@ export default {
 
 <style>
 </style>
+
+
