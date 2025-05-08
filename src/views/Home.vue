@@ -8,12 +8,19 @@
   </template>
   
   <script>
+  import api from '../api/axios';
   import DefaultLayout from '../layouts/DefaultLayout.vue'
     export default {
     name: 'Home',
     components: {
       DefaultLayout
-    }
+    },
+
+    async mounted() {
+      //const response = await api.get(`/get_party/`);
+      //console.log(response.data)
+  },
+  
   }
   </script>
   
