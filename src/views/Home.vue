@@ -17,8 +17,6 @@
     },
 
     async mounted() {
-      //const response = await api.get(`/get_party/`);
-      //console.log(response.data)
   },
   
   }
